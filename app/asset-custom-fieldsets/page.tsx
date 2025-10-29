@@ -2,30 +2,26 @@
 
 import { useState } from 'react';
 import { apiClient } from '@/lib/api-client';
-import { Theme } from '@/lib/types';
+import { AssetCustomFieldset } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ApiTestGet } from '@/components/api-test-get';
-import { Palette, Mail, Globe } from 'lucide-react';
+import { Settings, Tag, List } from 'lucide-react';
 
-export default function ThemesPage() {
+export default function AssetCustomFieldsetsPage() {
   // Test UI state
   const [listPage, setListPage] = useState(1);
   const [listPerPage, setListPerPage] = useState('10');
-  const [filterName, setFilterName] = useState('');
-  const [filterTags, setFilterTags] = useState('');
-  const [filterPublished, setFilterPublished] = useState('');
-  const [sortBy, setSortBy] = useState('');
-  const [themeId, setThemeId] = useState('');
+  const [fieldsetId, setFieldsetId] = useState('');
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Theme Browser</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Asset Custom Fieldsets</h1>
           <p className="mt-2 text-muted-foreground">
-            Browse available themes for creating branded emails and landing pages
+            Manage custom field configurations for your assets
           </p>
         </div>
       </div>
@@ -38,10 +34,10 @@ export default function ThemesPage() {
           <CardContent className="space-y-2">
             <div className="flex flex-wrap gap-2">
               <Badge variant="get" className="font-mono">
-                GET /themes
+                GET /asset-custom-fieldsets
               </Badge>
               <Badge variant="get" className="font-mono">
-                GET /themes/:id
+                GET /asset-custom-fieldsets/:id/asset-custom-fields
               </Badge>
             </div>
           </CardContent>
@@ -49,16 +45,16 @@ export default function ThemesPage() {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Theme Types</CardDescription>
+            <CardDescription>Custom Field Features</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-blue-600" />
-              <span className="text-sm">Email Themes</span>
+              <Tag className="h-4 w-4 text-teal-600" />
+              <span className="text-sm">Flexible Metadata</span>
             </div>
             <div className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-green-600" />
-              <span className="text-sm">Landing Page Themes</span>
+              <Settings className="h-4 w-4 text-slate-600" />
+              <span className="text-sm">Configurable Fields</span>
             </div>
           </CardContent>
         </Card>
@@ -69,9 +65,9 @@ export default function ThemesPage() {
           </CardHeader>
           <CardContent className="text-sm">
             <ul className="list-inside list-disc space-y-1 text-muted-foreground">
-              <li>Browse theme library</li>
-              <li>Select theme for assets</li>
-              <li>Maintain brand consistency</li>
+              <li>Store custom metadata</li>
+              <li>Extend asset properties</li>
+              <li>Organize field collections</li>
             </ul>
           </CardContent>
         </Card>
@@ -79,9 +75,9 @@ export default function ThemesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Themes API Endpoints</CardTitle>
+          <CardTitle>Asset Custom Fieldsets API Endpoints</CardTitle>
           <CardDescription>
-            Interactive testing for theme endpoints
+            Interactive testing for asset custom fieldset endpoints
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -90,14 +86,14 @@ export default function ThemesPage() {
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
                   <Badge variant="get" className="font-mono">GET</Badge>
-                  <span>/themes</span>
+                  <span>/asset-custom-fieldsets</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
                 <ApiTestGet
-                  title="List All Themes"
-                  description="Retrieve a paginated list of all themes in your organization"
-                  endpoint="GET /themes"
+                  title="List Asset Custom Fieldsets"
+                  description="Retrieve a paginated list of all asset custom fieldsets in your organization"
+                  endpoint="GET /asset-custom-fieldsets"
                   parameters={[
                     {
                       name: 'page',
@@ -113,46 +109,11 @@ export default function ThemesPage() {
                       value: listPerPage,
                       onChange: setListPerPage,
                     },
-                    {
-                      name: 'filter[name]',
-                      label: 'Filter by Name (optional)',
-                      placeholder: 'e.g., Modern Design',
-                      value: filterName,
-                      onChange: setFilterName,
-                    },
-                    {
-                      name: 'filter[tags]',
-                      label: 'Filter by Tags (optional)',
-                      placeholder: 'e.g., corporate,minimal',
-                      value: filterTags,
-                      onChange: setFilterTags,
-                    },
-                    {
-                      name: 'filter[published]',
-                      label: 'Filter by Published (optional)',
-                      placeholder: 'e.g., true or false',
-                      value: filterPublished,
-                      onChange: setFilterPublished,
-                    },
-                    {
-                      name: 'sort',
-                      label: 'Sort By (optional)',
-                      placeholder: 'e.g., created_at, name',
-                      value: sortBy,
-                      onChange: setSortBy,
-                    },
                   ]}
                   onExecute={async () => {
-                    const filters: any = {};
-                    if (filterName) filters.name = filterName;
-                    if (filterTags) filters.tags = filterTags;
-                    if (filterPublished) filters.published = filterPublished === 'true';
-
-                    return await apiClient.getThemes({
+                    return await apiClient.getAssetCustomFieldsets({
                       page: listPage,
                       per_page: parseInt(listPerPage) || 10,
-                      ...(Object.keys(filters).length > 0 && { filter: filters }),
-                      ...(sortBy && { sort: sortBy }),
                     });
                   }}
                 />
@@ -163,27 +124,27 @@ export default function ThemesPage() {
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
                   <Badge variant="get" className="font-mono">GET</Badge>
-                  <span>/themes/:id</span>
+                  <span>/asset-custom-fieldsets/:id/asset-custom-fields</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent>
                 <ApiTestGet
-                  title="Get Specific Theme"
-                  description="Retrieve detailed information about a specific theme"
-                  endpoint="GET /themes/{theme_id}"
+                  title="List Asset Custom Fields in Fieldset"
+                  description="Retrieve all asset custom fields within a specific asset custom fieldset"
+                  endpoint="GET /asset-custom-fieldsets/{asset_custom_fieldset_id}/asset-custom-fields"
                   parameters={[
                     {
-                      name: 'theme_id',
-                      label: 'Theme ID',
-                      placeholder: 'e.g., 609d7ce223411',
-                      value: themeId,
-                      onChange: setThemeId,
+                      name: 'asset_custom_fieldset_id',
+                      label: 'Asset Custom Fieldset ID',
+                      placeholder: 'e.g., 64a4810d4d12b',
+                      value: fieldsetId,
+                      onChange: setFieldsetId,
                       required: true,
                     },
                   ]}
                   onExecute={async () => {
-                    if (!themeId) throw new Error('Theme ID is required');
-                    return await apiClient.getTheme(themeId);
+                    if (!fieldsetId) throw new Error('Asset Custom Fieldset ID is required');
+                    return await apiClient.getAssetCustomFieldsInFieldset(fieldsetId);
                   }}
                 />
               </AccordionContent>

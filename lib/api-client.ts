@@ -154,10 +154,18 @@ class KnakApiClient {
   async getThemes(params?: {
     page?: number;
     per_page?: number;
+    filter?: { name?: string; tags?: string; published?: boolean };
+    sort?: string;
   }): Promise<PaginatedResponse<Theme>> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.per_page) queryParams.append('per_page', params.per_page.toString());
+    if (params?.filter?.name) queryParams.append('filter[name]', params.filter.name);
+    if (params?.filter?.tags) queryParams.append('filter[tags]', params.filter.tags);
+    if (params?.filter?.published !== undefined) {
+      queryParams.append('filter[published]', params.filter.published.toString());
+    }
+    if (params?.sort) queryParams.append('sort', params.sort);
 
     const query = queryParams.toString();
     return this.request<PaginatedResponse<Theme>>(
@@ -173,10 +181,12 @@ class KnakApiClient {
   async getBrands(params?: {
     page?: number;
     per_page?: number;
+    sort?: string;
   }): Promise<PaginatedResponse<Brand>> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.per_page) queryParams.append('per_page', params.per_page.toString());
+    if (params?.sort) queryParams.append('sort', params.sort);
 
     const query = queryParams.toString();
     return this.request<PaginatedResponse<Brand>>(
@@ -188,15 +198,50 @@ class KnakApiClient {
   async getAssetFolders(params?: {
     page?: number;
     per_page?: number;
+    filter?: { brand_id?: string; parent_folder_id?: string };
   }): Promise<PaginatedResponse<AssetFolder>> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.per_page) queryParams.append('per_page', params.per_page.toString());
+    if (params?.filter?.brand_id) queryParams.append('filter[brand_id]', params.filter.brand_id);
+    if (params?.filter?.parent_folder_id) {
+      queryParams.append('filter[parent_folder_id]', params.filter.parent_folder_id);
+    }
 
     const query = queryParams.toString();
     return this.request<PaginatedResponse<AssetFolder>>(
       `/asset-folders${query ? `?${query}` : ''}`
     );
+  }
+
+  async createAssetFolder(data: {
+    name: string;
+    type: 'folder' | 'campaign';
+    parent_folder_id: string;
+  }): Promise<{ data: AssetFolder }> {
+    return this.request<{ data: AssetFolder }>('/asset-folders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateAssetFolder(
+    folderId: string,
+    data: {
+      name?: string;
+      parent_folder_id?: string;
+    }
+  ): Promise<{ data: AssetFolder }> {
+    return this.request<{ data: AssetFolder }>(`/asset-folders/${folderId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteAssetFolder(folderId: string): Promise<void> {
+    return this.request<void>(`/asset-folders/${folderId}`, {
+      method: 'DELETE',
+    });
   }
 
   // Asset Custom Fieldset endpoints
@@ -211,6 +256,12 @@ class KnakApiClient {
     const query = queryParams.toString();
     return this.request<PaginatedResponse<AssetCustomFieldset>>(
       `/asset-custom-fieldsets${query ? `?${query}` : ''}`
+    );
+  }
+
+  async getAssetCustomFieldsInFieldset(fieldsetId: string): Promise<{ data: Array<{ key: string; value: string }> }> {
+    return this.request<{ data: Array<{ key: string; value: string }> }>(
+      `/asset-custom-fieldsets/${fieldsetId}/asset-custom-fields`
     );
   }
 
@@ -233,10 +284,13 @@ class KnakApiClient {
   async getMergeTags(params?: {
     page?: number;
     per_page?: number;
+    filter?: { name?: string; platform_id?: string };
   }): Promise<PaginatedResponse<MergeTag>> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.per_page) queryParams.append('per_page', params.per_page.toString());
+    if (params?.filter?.name) queryParams.append('filter[name]', params.filter.name);
+    if (params?.filter?.platform_id) queryParams.append('filter[platform_id]', params.filter.platform_id);
 
     const query = queryParams.toString();
     return this.request<PaginatedResponse<MergeTag>>(
@@ -248,9 +302,59 @@ class KnakApiClient {
     return this.request<{ data: MergeTag }>(`/merge-tags/${mergeTagId}`);
   }
 
+  async createMergeTag(data: {
+    name: string;
+    platform_id: string;
+    merge_tag_value: string;
+    description?: string;
+    is_special_link?: boolean;
+    velocity_script_token?: string;
+  }): Promise<{ data: MergeTag }> {
+    return this.request<{ data: MergeTag }>('/merge-tags', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateMergeTag(
+    mergeTagId: string,
+    data: {
+      description?: string;
+      merge_tag_value?: string;
+      velocity_script_token?: string;
+      is_special_link?: boolean;
+    }
+  ): Promise<{ data: MergeTag }> {
+    return this.request<{ data: MergeTag }>(`/merge-tags/${mergeTagId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteMergeTag(mergeTagId: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/merge-tags/${mergeTagId}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Sync Status endpoints
   async getSyncStatus(syncStatusId: string): Promise<{ data: SyncStatus }> {
     return this.request<{ data: SyncStatus }>(`/sync-statuses/${syncStatusId}`);
+  }
+
+  async updateSyncStatus(
+    syncStatusId: string,
+    data: {
+      map_id?: string;
+      map_url?: string | null;
+      error_message?: string | null;
+      status?: 'in_progress' | 'complete' | 'error' | 'confirmation_requested';
+    }
+  ): Promise<{ data: SyncStatus }> {
+    return this.request<{ data: SyncStatus }>(`/sync-statuses/${syncStatusId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
   }
 
   // Translation Request endpoints
@@ -280,6 +384,27 @@ class KnakApiClient {
     return this.request<{ data: TranslationRequest }>('/translation-requests', {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  }
+
+  // Project Management endpoints
+  async getProjectManagementLink(assetId: string): Promise<{ data: any }> {
+    return this.request<{ data: any }>(`/assets/${assetId}/project-management-link`);
+  }
+
+  async updateProjectManagementLink(
+    assetId: string,
+    data: { integration_id: string; project_management_url: string }
+  ): Promise<{ data: any }> {
+    return this.request<{ data: any }>(`/assets/${assetId}/project-management-link`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteProjectManagementLink(assetId: string): Promise<void> {
+    return this.request<void>(`/assets/${assetId}/project-management-link`, {
+      method: 'DELETE',
     });
   }
 }

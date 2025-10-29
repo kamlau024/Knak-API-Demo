@@ -13,7 +13,7 @@ import { ApiTestMutation } from '@/components/api-test-mutation';
 import { FileText, Mail, Globe, Search, Plus, Loader2, AlertCircle } from 'lucide-react';
 
 export default function AssetsPage() {
-  // Test UI state
+  // Test UI state - Asset endpoints
   const [listPage, setListPage] = useState(1);
   const [listPerPage, setListPerPage] = useState('10');
   const [filterParentAssetId, setFilterParentAssetId] = useState('');
@@ -22,6 +22,11 @@ export default function AssetsPage() {
   const [contentPlatform, setContentPlatform] = useState('');
   const [customFieldsAssetId, setCustomFieldsAssetId] = useState('');
   const [updateCustomFieldsAssetId, setUpdateCustomFieldsAssetId] = useState('');
+
+  // Test UI state - Project Management endpoints
+  const [pmGetAssetId, setPmGetAssetId] = useState('');
+  const [pmUpdateAssetId, setPmUpdateAssetId] = useState('');
+  const [pmDeleteAssetId, setPmDeleteAssetId] = useState('');
 
   return (
     <div className="space-y-6">
@@ -41,23 +46,32 @@ export default function AssetsPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex flex-wrap gap-2">
-              <Badge className="font-mono text-xs http-method-get">
+              <Badge variant="get" className="font-mono">
                 GET /assets
               </Badge>
-              <Badge className="font-mono text-xs http-method-post">
+              <Badge variant="post" className="font-mono">
                 POST /assets
               </Badge>
-              <Badge className="font-mono text-xs http-method-get">
+              <Badge variant="get" className="font-mono">
                 GET /assets/:id
               </Badge>
-              <Badge className="font-mono text-xs http-method-get">
+              <Badge variant="get" className="font-mono">
                 GET /assets/:id/content
               </Badge>
-              <Badge className="font-mono text-xs http-method-get">
+              <Badge variant="get" className="font-mono">
                 GET /assets/:id/custom-fields
               </Badge>
-              <Badge className="font-mono text-xs http-method-patch">
+              <Badge variant="patch" className="font-mono">
                 PATCH /assets/:id/custom-fields
+              </Badge>
+              <Badge variant="get" className="font-mono">
+                GET /assets/:id/project-management-link
+              </Badge>
+              <Badge variant="patch" className="font-mono">
+                PATCH /assets/:id/project-management-link
+              </Badge>
+              <Badge variant="delete" className="font-mono">
+                DELETE /assets/:id/project-management-link
               </Badge>
             </div>
           </CardContent>
@@ -96,7 +110,7 @@ export default function AssetsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Test API Endpoints</CardTitle>
+          <CardTitle>Assets API Endpoints</CardTitle>
           <CardDescription>
             Interactive testing for asset endpoints
           </CardDescription>
@@ -106,7 +120,7 @@ export default function AssetsPage() {
             <AccordionItem value="item-1">
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
-                  <Badge className="font-mono text-xs http-method-post">POST</Badge>
+                  <Badge variant="post" className="font-mono">POST</Badge>
                   <span>/assets</span>
                 </div>
               </AccordionTrigger>
@@ -144,7 +158,7 @@ export default function AssetsPage() {
             <AccordionItem value="item-2">
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
-                  <Badge className="font-mono text-xs http-method-get">GET</Badge>
+                  <Badge variant="get" className="font-mono">GET</Badge>
                   <span>/assets</span>
                 </div>
               </AccordionTrigger>
@@ -190,7 +204,7 @@ export default function AssetsPage() {
             <AccordionItem value="item-3">
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
-                  <Badge className="font-mono text-xs http-method-get">GET</Badge>
+                  <Badge variant="get" className="font-mono">GET</Badge>
                   <span>/assets/:id</span>
                 </div>
               </AccordionTrigger>
@@ -220,7 +234,7 @@ export default function AssetsPage() {
             <AccordionItem value="item-4">
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
-                  <Badge className="font-mono text-xs http-method-get">GET</Badge>
+                  <Badge variant="get" className="font-mono">GET</Badge>
                   <span>/assets/:id/content</span>
                 </div>
               </AccordionTrigger>
@@ -260,7 +274,7 @@ export default function AssetsPage() {
             <AccordionItem value="item-5">
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
-                  <Badge className="font-mono text-xs http-method-get">GET</Badge>
+                  <Badge variant="get" className="font-mono">GET</Badge>
                   <span>/assets/:id/custom-fields</span>
                 </div>
               </AccordionTrigger>
@@ -290,7 +304,7 @@ export default function AssetsPage() {
             <AccordionItem value="item-6">
               <AccordionTrigger>
                 <div className="flex items-center gap-2">
-                  <Badge className="font-mono text-xs http-method-patch">PATCH</Badge>
+                  <Badge variant="patch" className="font-mono">PATCH</Badge>
                   <span>/assets/:id/custom-fields</span>
                 </div>
               </AccordionTrigger>
@@ -326,6 +340,113 @@ export default function AssetsPage() {
                     className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                 </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Project Management API Endpoints</CardTitle>
+          <CardDescription>
+            Link assets to external project management systems
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <Badge variant="get" className="font-mono">GET</Badge>
+                  <span>/assets/:id/project-management-link</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <ApiTestGet
+                  title="Retrieve Project Management Link"
+                  description="Retrieve the most recently created project management link for an asset"
+                  endpoint="GET /assets/{asset_id}/project-management-link"
+                  parameters={[
+                    {
+                      name: 'asset_id',
+                      label: 'Asset ID',
+                      placeholder: 'e.g., 609d7ce223411',
+                      value: pmGetAssetId,
+                      onChange: setPmGetAssetId,
+                      required: true,
+                    },
+                  ]}
+                  onExecute={async () => {
+                    if (!pmGetAssetId) throw new Error('Asset ID is required');
+                    return await apiClient.getProjectManagementLink(pmGetAssetId);
+                  }}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-2">
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <Badge variant="patch" className="font-mono">PATCH</Badge>
+                  <span>/assets/:id/project-management-link</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <ApiTestMutation
+                  title="Update/Create Project Management Link"
+                  description="Update the most recently created project management link for an asset or create a new one if one does not exist"
+                  endpoint="/assets/{asset_id}/project-management-link"
+                  method="PATCH"
+                  defaultBody={{
+                    integration_id: '609d7ce223411',
+                    project_management_url: 'https://knak.my.workfront.com/task/64a521d456747a13ec3fc60911274eda2/documents',
+                  }}
+                  onExecute={async (body) => {
+                    if (!pmUpdateAssetId) throw new Error('Asset ID is required');
+                    return await apiClient.updateProjectManagementLink(pmUpdateAssetId, body);
+                  }}
+                />
+                <div className="mt-4">
+                  <label className="text-xs text-muted-foreground">Asset ID</label>
+                  <input
+                    type="text"
+                    value={pmUpdateAssetId}
+                    onChange={(e) => setPmUpdateAssetId(e.target.value)}
+                    placeholder="e.g., 609d7ce223411"
+                    className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3">
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <Badge variant="delete" className="font-mono">DELETE</Badge>
+                  <span>/assets/:id/project-management-link</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <ApiTestGet
+                  title="Delete Project Management Link"
+                  description="Delete the most recently created project management link for an asset"
+                  endpoint="DELETE /assets/{asset_id}/project-management-link"
+                  parameters={[
+                    {
+                      name: 'asset_id',
+                      label: 'Asset ID',
+                      placeholder: 'e.g., 609d7ce223411',
+                      value: pmDeleteAssetId,
+                      onChange: setPmDeleteAssetId,
+                      required: true,
+                    },
+                  ]}
+                  onExecute={async () => {
+                    if (!pmDeleteAssetId) throw new Error('Asset ID is required');
+                    return await apiClient.deleteProjectManagementLink(pmDeleteAssetId);
+                  }}
+                />
               </AccordionContent>
             </AccordionItem>
           </Accordion>

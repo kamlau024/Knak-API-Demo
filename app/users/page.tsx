@@ -4,40 +4,20 @@ import { useState } from 'react';
 import { apiClient } from '@/lib/api-client';
 import { User } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Users as UsersIcon, Search, Loader2, Mail, UserCircle, AlertCircle } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ApiTestGet } from '@/components/api-test-get';
+import { Users as UsersIcon, Mail, UserCircle } from 'lucide-react';
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await apiClient.getUsers({ page, per_page: 10 });
-      setUsers(response.data);
-      setTotalPages(response.meta.total_pages);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch users');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getRoleColor = (role: string) => {
-    const colors: Record<string, string> = {
-      admin: 'bg-red-100 text-red-800',
-      builder: 'bg-blue-100 text-blue-800',
-      viewer: 'bg-gray-100 text-gray-800',
-    };
-    return colors[role.toLowerCase()] || 'bg-gray-100 text-gray-800';
-  };
+  // Test UI state
+  const [listPage, setListPage] = useState(1);
+  const [listPerPage, setListPerPage] = useState('10');
+  const [filterEmail, setFilterEmail] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [userId, setUserId] = useState('');
+  const [deleteUserId, setDeleteUserId] = useState('');
+  const [reassignTo, setReassignTo] = useState('');
 
   return (
     <div className="space-y-6">
@@ -56,15 +36,17 @@ export default function UsersPage() {
             <CardDescription>Available Endpoints</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Badge variant="outline" className="font-mono text-xs">
-              GET /users
-            </Badge>
-            <Badge variant="outline" className="font-mono text-xs">
-              GET /users/:id
-            </Badge>
-            <Badge variant="outline" className="font-mono text-xs">
-              DELETE /users/:id
-            </Badge>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="get" className="font-mono">
+                GET /users
+              </Badge>
+              <Badge variant="get" className="font-mono">
+                GET /users/:id
+              </Badge>
+              <Badge variant="delete" className="font-mono">
+                DELETE /users/:id
+              </Badge>
+            </div>
           </CardContent>
         </Card>
 
@@ -95,140 +77,134 @@ export default function UsersPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Users List</CardTitle>
-              <CardDescription>
-                Fetch and display all users in your Knak organization
-              </CardDescription>
-            </div>
-            <Button onClick={fetchUsers} disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                <>
-                  <Search className="mr-2 h-4 w-4" />
-                  Fetch Users
-                </>
-              )}
-            </Button>
-          </div>
+          <CardTitle>Users API Endpoints</CardTitle>
+          <CardDescription>
+            Interactive testing for user endpoints
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {!error && users.length === 0 && !loading && (
-            <div className="py-12 text-center">
-              <UsersIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-              <p className="mt-4 text-sm text-muted-foreground">
-                No users loaded yet. Click "Fetch Users" to load your users.
-              </p>
-            </div>
-          )}
-
-          {users.length > 0 && (
-            <div className="space-y-4">
-              <div className="space-y-3">
-                {users.map((user) => (
-                  <Card key={user.id}>
-                    <CardContent className="flex items-center justify-between p-4">
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
-                          <UserCircle className="h-6 w-6 text-secondary-foreground" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold">{user.name}</h3>
-                            <Badge className={`${getRoleColor(user.role)} border-0`}>
-                              {user.role}
-                            </Badge>
-                          </div>
-                          <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                            <Mail className="h-3 w-3" />
-                            {user.email}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right text-sm text-muted-foreground">
-                        <div>ID: {user.id}</div>
-                        <div>
-                          Joined: {new Date(user.created_at).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page === 1 || loading}
-                    onClick={() => {
-                      setPage(page - 1);
-                      fetchUsers();
-                    }}
-                  >
-                    Previous
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    Page {page} of {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={page === totalPages || loading}
-                    onClick={() => {
-                      setPage(page + 1);
-                      fetchUsers();
-                    }}
-                  >
-                    Next
-                  </Button>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <Badge variant="get" className="font-mono">GET</Badge>
+                  <span>/users</span>
                 </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </AccordionTrigger>
+              <AccordionContent>
+                <ApiTestGet
+                  title="List All Users"
+                  description="Retrieve a paginated list of all users in your organization"
+                  endpoint="GET /users"
+                  parameters={[
+                    {
+                      name: 'page',
+                      label: 'Page',
+                      placeholder: 'e.g., 1',
+                      value: listPage.toString(),
+                      onChange: (value) => setListPage(parseInt(value) || 1),
+                    },
+                    {
+                      name: 'per_page',
+                      label: 'Per Page',
+                      placeholder: 'e.g., 10',
+                      value: listPerPage,
+                      onChange: setListPerPage,
+                    },
+                    {
+                      name: 'filter[email]',
+                      label: 'Filter by Email (optional)',
+                      placeholder: 'e.g., john@example.com',
+                      value: filterEmail,
+                      onChange: setFilterEmail,
+                    },
+                    {
+                      name: 'sort',
+                      label: 'Sort By (optional)',
+                      placeholder: 'e.g., created_at',
+                      value: sortBy,
+                      onChange: setSortBy,
+                    },
+                  ]}
+                  onExecute={async () => {
+                    return await apiClient.getUsers({
+                      page: listPage,
+                      per_page: parseInt(listPerPage) || 10,
+                      filter: filterEmail ? { email: filterEmail } : undefined,
+                      sort: sortBy || undefined,
+                    });
+                  }}
+                />
+              </AccordionContent>
+            </AccordionItem>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>API Features</CardTitle>
-          <CardDescription>Additional user management capabilities</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h4 className="mb-2 text-sm font-medium">Filtering</h4>
-            <p className="text-sm text-muted-foreground">
-              You can filter users by email using the `filter[email]` query parameter
-              with partial matching support.
-            </p>
-            <div className="mt-2 rounded-md bg-muted p-3">
-              <code className="text-xs">
-                GET /users?filter[email]=john@example.com
-              </code>
-            </div>
-          </div>
-          <div>
-            <h4 className="mb-2 text-sm font-medium">Sorting</h4>
-            <p className="text-sm text-muted-foreground">
-              Sort users by created_at or updated_at fields.
-            </p>
-            <div className="mt-2 rounded-md bg-muted p-3">
-              <code className="text-xs">GET /users?sort=created_at</code>
-            </div>
-          </div>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <Badge variant="get" className="font-mono">GET</Badge>
+                  <span>/users/:id</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <ApiTestGet
+                  title="Get Specific User"
+                  description="Retrieve detailed information about a specific user"
+                  endpoint="GET /users/{user_id}"
+                  parameters={[
+                    {
+                      name: 'user_id',
+                      label: 'User ID',
+                      placeholder: 'e.g., 609d7ce223411',
+                      value: userId,
+                      onChange: setUserId,
+                      required: true,
+                    },
+                  ]}
+                  onExecute={async () => {
+                    if (!userId) throw new Error('User ID is required');
+                    return await apiClient.getUser(userId);
+                  }}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3">
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <Badge variant="delete" className="font-mono">DELETE</Badge>
+                  <span>/users/:id</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <ApiTestGet
+                  title="Delete User"
+                  description="Delete a user from your organization. Optionally reassign their assets to another user."
+                  endpoint="DELETE /users/{user_id}"
+                  parameters={[
+                    {
+                      name: 'user_id',
+                      label: 'User ID to Delete',
+                      placeholder: 'e.g., 609d7ce223411',
+                      value: deleteUserId,
+                      onChange: setDeleteUserId,
+                      required: true,
+                    },
+                    {
+                      name: 'user_to_reassign',
+                      label: 'Reassign Assets To (optional)',
+                      placeholder: 'e.g., 507b9de116822',
+                      value: reassignTo,
+                      onChange: setReassignTo,
+                    },
+                  ]}
+                  onExecute={async () => {
+                    if (!deleteUserId) throw new Error('User ID is required');
+                    return await apiClient.deleteUser(deleteUserId, reassignTo || undefined);
+                  }}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </CardContent>
       </Card>
     </div>

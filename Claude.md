@@ -1,7 +1,8 @@
 # Project Context
-You are assisting with the development of a web application. Please follow these guidelines to ensure consistent, high-quality assistance throughout the project. The project is a web application that streamlines the workflow of mortgage brokers specializing in private lending. The mortgage brokers will have to handle communication between the borrowers by understanding their needs and why they are borrowing money from private lenders. The mortgage brokers will also have to work with private lenders to find the best match for the lender.
+You are assisting with the development of a web application that speeds up the learning and testing of the Knak API endpoints. Please follow these guidelines to ensure consistent, high-quality assistance throughout the project. 
 
 ## General Principles
+*   Never hallucinate, if you have questions, or if the instructions are unclear, please ask instead of just create something for the sake of providing a quick solution. Always refer to the file openapi.yml for the available API endpoints.
 *   Write clean, readable, and maintainable code
 *   Follow established conventions for the technologies being used
 *   Prioritize code clarity over cleverness

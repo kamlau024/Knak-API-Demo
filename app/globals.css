@@ -61,11 +61,11 @@
 @layer components {
   /* HTTP Method Badge Styles */
   .http-method-get {
-    @apply bg-blue-500 text-white border-blue-600;
+    @apply bg-green-500 text-white border-green-600;
   }
 
   .http-method-post {
-    @apply bg-green-500 text-white border-green-600;
+    @apply bg-blue-500 text-white border-blue-600;
   }
 
   .http-method-patch {

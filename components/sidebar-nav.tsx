@@ -14,9 +14,7 @@ import {
   Boxes,
   Tag,
   RefreshCw,
-  Languages,
-  Plug,
-  FolderTree,
+  FileType,
 } from 'lucide-react';
 
 const navigation = [
@@ -71,19 +69,9 @@ const navigation = [
     icon: RefreshCw,
   },
   {
-    name: 'Translations',
-    href: '/translations',
-    icon: Languages,
-  },
-  {
-    name: 'Integrations',
-    href: '/integrations',
-    icon: Plug,
-  },
-  {
-    name: 'Organization',
-    href: '/organization',
-    icon: FolderTree,
+    name: 'Translation Requests',
+    href: '/translation-requests',
+    icon: FileType,
   },
 ];
 

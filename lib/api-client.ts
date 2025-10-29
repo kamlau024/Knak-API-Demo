@@ -361,10 +361,26 @@ class KnakApiClient {
   async getTranslationRequests(params?: {
     page?: number;
     per_page?: number;
+    filter?: {
+      status?: string;
+      asset_id?: string;
+      created_at_before?: string;
+      created_at_after?: string;
+    };
+    sort?: string;
   }): Promise<PaginatedResponse<TranslationRequest>> {
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.per_page) queryParams.append('per_page', params.per_page.toString());
+    if (params?.filter?.status) queryParams.append('filter[status]', params.filter.status);
+    if (params?.filter?.asset_id) queryParams.append('filter[asset_id]', params.filter.asset_id);
+    if (params?.filter?.created_at_before) {
+      queryParams.append('filter[created_at_before]', params.filter.created_at_before);
+    }
+    if (params?.filter?.created_at_after) {
+      queryParams.append('filter[created_at_after]', params.filter.created_at_after);
+    }
+    if (params?.sort) queryParams.append('sort', params.sort);
 
     const query = queryParams.toString();
     return this.request<PaginatedResponse<TranslationRequest>>(
@@ -385,6 +401,66 @@ class KnakApiClient {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  }
+
+  async updateTranslationRequest(
+    id: string,
+    data: {
+      status: 'processing' | 'completed' | 'failed' | 'cancelled';
+    }
+  ): Promise<{ data: TranslationRequest }> {
+    return this.request<{ data: TranslationRequest }>(`/translation-requests/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async downloadTranslationSource(
+    id: string,
+    format?: 'arb' | 'xliff-1.2' | 'xliff-2.0'
+  ): Promise<Blob> {
+    const query = format ? `?format=${format}` : '';
+    const response = await fetch(
+      `${this.baseUrl}/translation-requests/${id}/download-source${query}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${getApiToken()}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.errors?.[0]?.detail || 'Download failed');
+    }
+    return response.blob();
+  }
+
+  async uploadTranslation(id: string, file: File): Promise<{ message: string }> {
+    const token = getApiToken();
+    if (!token) {
+      throw new Error('API token not set. Please configure your authentication.');
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(
+      `${this.baseUrl}/translation-requests/${id}/upload-translation`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.errors?.[0]?.detail || 'Upload failed');
+    }
+
+    return response.json();
   }
 
   // Project Management endpoints

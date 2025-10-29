@@ -21,36 +21,89 @@ This prototype application provides interactive interfaces for exploring the fol
 - Overview of all API capabilities
 - Quick links to different sections
 - Getting started guide
+- Visual feature cards with endpoint information
 
-### 2. Assets Manager
-**Endpoints:** `GET /assets`, `POST /assets`, `GET /assets/:id`
+### 2. Assets Management
+**Endpoints:**
+- `GET /assets` - List all assets with pagination and filtering
+- `POST /assets` - Create new email or landing page assets
+- `GET /assets/:id` - Get detailed asset information
+- `PATCH /assets/:id/custom-fields` - Update asset custom fields
+- `GET /assets/:id/project-management-link` - Get project management integration
+- `PATCH /assets/:id/project-management-link` - Update project management link
+- `DELETE /assets/:id/project-management-link` - Remove project management link
 
-Browse, create, and manage email and landing page assets. View asset details including type, status, creator, and timestamps.
+Browse, create, and manage email and landing page assets. View asset details including type, status, creator, and timestamps. Link assets to external project management systems.
 
 ### 3. User Management
-**Endpoints:** `GET /users`, `GET /users/:id`, `DELETE /users/:id`
+**Endpoints:**
+- `GET /users` - List all users with pagination and filtering
+- `GET /users/:id` - Get specific user details
+- `DELETE /users/:id` - Remove user from organization
 
 View and manage users within your Knak organization. Filter users by email and sort by creation date.
 
-### 4. Theme Browser
-**Endpoints:** `GET /themes`, `GET /themes/:id`
+### 4. Themes
+**Endpoints:**
+- `GET /themes` - Browse available themes with filtering and sorting
+- `GET /themes/:id` - Get detailed theme information
 
-Browse available themes for creating branded assets. Themes provide consistent design elements across your marketing materials.
+Browse available themes for creating branded assets. Filter by name, tags, and published status. Themes provide consistent design elements across your marketing materials.
 
-### 5. Translation Management
-**Endpoints:** `GET /translation-requests`, `POST /translation-requests`, `GET /translation-requests/:id/download-source`, `POST /translation-requests/:id/upload-translation`
+### 5. Brands
+**Endpoints:**
+- `GET /brands` - List all brands with pagination and sorting
 
-Request and manage asset translations across multiple languages. Track translation status and download/upload translated content.
+View and manage brand guidelines and settings for your organization.
 
-### 6. Platform Integrations
-**Endpoints:** `GET /available-platforms`, `GET /merge-tags`, `GET /merge-tags/:id`
+### 6. Asset Folders
+**Endpoints:**
+- `POST /asset-folders` - Create new folders or campaigns
+- `GET /asset-folders` - List folders with filtering by brand and parent
+- `PATCH /asset-folders/:id` - Update folder properties
+- `DELETE /asset-folders/:id` - Remove folders
 
-View integrated marketing automation platforms and their merge tags for dynamic content personalization.
+Organize assets hierarchically using folders and campaigns. Filter by brand and navigate folder structures.
 
-### 7. Organization
-**Endpoints:** `GET /brands`, `GET /asset-folders`, `GET /asset-folders/:id`
+### 7. Asset Custom Fieldsets
+**Endpoints:**
+- `GET /asset-custom-fieldsets` - List all custom fieldsets
+- `GET /asset-custom-fieldsets/:id/asset-custom-fields` - Get fields in a fieldset
 
-Browse brands and folder structures for organizing your assets hierarchically.
+Manage custom field configurations for assets. Define and retrieve custom metadata schemas.
+
+### 8. Available Platforms
+**Endpoints:**
+- `GET /available-platforms` - List integrated marketing automation platforms
+
+View marketing automation platforms available for integration with your Knak organization.
+
+### 9. Merge Tags
+**Endpoints:**
+- `POST /merge-tags` - Create new merge tags
+- `GET /merge-tags` - List merge tags with filtering by name and platform
+- `GET /merge-tags/:id` - Get specific merge tag details
+- `PATCH /merge-tags/:id` - Update merge tag properties
+- `DELETE /merge-tags/:id` - Remove merge tags
+
+Manage dynamic content merge tags for personalization. Full CRUD operations with platform-specific filtering.
+
+### 10. Sync Statuses
+**Endpoints:**
+- `GET /sync-statuses/:id` - Get synchronization status details
+- `PATCH /sync-statuses/:id` - Update sync status information
+
+Track and manage synchronization statuses for platform integrations. Monitor sync progress and update results.
+
+### 11. Translation Requests
+**Endpoints:**
+- `GET /translation-requests` - List translation requests with advanced filtering
+- `GET /translation-requests/:id` - Get specific translation request
+- `PATCH /translation-requests/:id` - Update translation request status
+- `GET /translation-requests/:id/download-source` - Download source file in multiple formats
+- `POST /translation-requests/:id/upload-translation` - Upload completed translation
+
+Request and manage asset translations across multiple languages. Track translation status, download source files (ARB, XLIFF 1.2, XLIFF 2.0), and upload translated content. Filter by status, asset, and creation dates.
 
 ## Tech Stack
 
@@ -115,26 +168,32 @@ For production applications, use the OAuth2 flow. Manage OAuth2 applications at 
 
 ```
 ├── app/
-│   ├── assets/          # Assets management page
-│   ├── integrations/    # Platform integrations page
-│   ├── organization/    # Brands and folders page
-│   ├── themes/          # Theme browser page
-│   ├── translations/    # Translation management page
-│   ├── users/           # User management page
-│   ├── layout.tsx       # Root layout with sidebar
-│   ├── page.tsx         # Dashboard/home page
-│   └── globals.css      # Global styles with Tailwind directives
+│   ├── assets/                    # Assets management page
+│   ├── users/                     # User management page
+│   ├── themes/                    # Themes browser page
+│   ├── brands/                    # Brands page
+│   ├── asset-folders/             # Asset folders page
+│   ├── asset-custom-fieldsets/    # Custom fieldsets page
+│   ├── available-platforms/       # Available platforms page
+│   ├── merge-tags/                # Merge tags management page
+│   ├── sync-statuses/             # Sync statuses page
+│   ├── translation-requests/      # Translation requests page
+│   ├── layout.tsx                 # Root layout with sidebar
+│   ├── page.tsx                   # Dashboard/home page
+│   └── globals.css                # Global styles with Tailwind directives
 ├── components/
-│   ├── ui/              # shadcn/ui components (Card, Button, Badge, Input, Alert, etc.)
-│   ├── api-token-input.tsx  # API token configuration
-│   └── sidebar-nav.tsx      # Navigation component
+│   ├── ui/                        # shadcn/ui components (Card, Button, Badge, Input, Accordion, etc.)
+│   ├── api-test-get.tsx           # Reusable GET/DELETE endpoint test UI
+│   ├── api-test-mutation.tsx      # Reusable POST/PATCH endpoint test UI
+│   ├── api-token-input.tsx        # API token configuration
+│   └── sidebar-nav.tsx            # Navigation component
 ├── lib/
-│   ├── api-client.ts    # Knak API client
-│   ├── types.ts         # TypeScript type definitions
-│   └── utils.ts         # Utility functions (cn helper)
-├── components.json      # shadcn/ui configuration
-├── tailwind.config.ts   # Tailwind CSS configuration
-└── openapi.yml          # Knak API specification
+│   ├── api-client.ts              # Knak API client with all endpoint methods
+│   ├── types.ts                   # TypeScript type definitions
+│   └── utils.ts                   # Utility functions (cn helper)
+├── components.json                # shadcn/ui configuration
+├── tailwind.config.ts             # Tailwind CSS configuration
+└── openapi.yml                    # Knak API specification
 ```
 
 ## Available Scripts
@@ -146,43 +205,70 @@ For production applications, use the OAuth2 flow. Manage OAuth2 applications at 
 
 ## API Endpoints Demonstrated
 
-### Users
+### Assets Management
+- List all assets (emails and landing pages) with pagination
+- Create new assets with theme and brand association
+- Get detailed asset information
+- Update asset custom fields
+- Manage project management integrations (GET/PATCH/DELETE)
+- Filter by parent asset
+
+### User Management
 - List all users with pagination
 - Get specific user details
+- Delete users from organization
 - Filter users by email
 - Sort by created_at or updated_at
 
-### Assets
-- List all assets (emails and landing pages)
-- Create new assets
-- Get asset details
-- Filter by parent asset
-
 ### Themes
-- Browse available themes
-- Get theme details
-- Filter by type (email/landing)
+- Browse available themes with pagination
+- Get detailed theme information
+- Filter by name, tags, and published status
+- Sort themes by various fields
 
 ### Brands
-- List all brands
-- View brand containers
+- List all brands with pagination
+- Sort brands by various fields
 
 ### Asset Folders
-- Browse folder structure
-- View hierarchical organization
+- Create new folders and campaigns
+- List folders with pagination
+- Update folder properties (name, parent)
+- Delete folders
+- Filter by brand_id and parent_folder_id
+- Navigate hierarchical folder structures
+
+### Asset Custom Fieldsets
+- List all custom fieldsets
+- Get custom fields within a specific fieldset
+- View field configurations and metadata schemas
 
 ### Available Platforms
-- List integrated platforms
-- View platform details
+- List all integrated marketing automation platforms
+- View platform details and capabilities
 
 ### Merge Tags
-- Browse merge tags for personalization
-- View tag codes and platform associations
+- Create new merge tags
+- List merge tags with pagination
+- Get specific merge tag details
+- Update merge tag properties
+- Delete merge tags
+- Filter by name and platform_id
+- Full CRUD operations for dynamic content personalization
+
+### Sync Statuses
+- Get synchronization status by ID
+- Update sync status (map_id, map_url, error_message, status)
+- Track integration progress and results
 
 ### Translation Requests
-- List translation requests
-- View translation status
-- Create new translation requests
+- List translation requests with advanced filtering
+- Get specific translation request details
+- Update translation request status
+- Download source files in multiple formats (ARB, XLIFF 1.2, XLIFF 2.0)
+- Upload completed translation files
+- Filter by status, asset_id, created_at_before, created_at_after
+- Sort by various fields
 
 ## API Features
 
@@ -209,12 +295,16 @@ The application handles common API errors:
 
 This prototype demonstrates several real-world use cases:
 
-1. **Campaign Management:** Browse and create email/landing page assets for marketing campaigns
-2. **Team Administration:** View and manage users with different roles
-3. **Brand Consistency:** Use themes to maintain consistent branding
-4. **Localization:** Request and manage translations for global campaigns
-5. **Platform Integration:** View connected marketing automation platforms
-6. **Content Organization:** Organize assets using brands and folders
+1. **Campaign Management:** Browse and create email/landing page assets for marketing campaigns with theme and brand association
+2. **Team Administration:** View and manage users within your organization with filtering and sorting capabilities
+3. **Brand Consistency:** Browse themes to maintain consistent branding across all marketing materials
+4. **Content Organization:** Create hierarchical folder structures to organize assets by brand, campaign, or project
+5. **Custom Metadata:** Define and manage custom field schemas for assets to track additional metadata
+6. **Platform Integration:** View available marketing automation platforms and manage merge tags for dynamic content
+7. **Sync Monitoring:** Track synchronization statuses for platform integrations and update sync results
+8. **Localization:** Request translations, download source files in multiple formats, and upload completed translations
+9. **Project Management Integration:** Link assets to external project management systems for workflow coordination
+10. **Dynamic Content:** Create and manage merge tags for personalization across different platforms
 
 ## Resources
 
@@ -227,10 +317,43 @@ This prototype demonstrates several real-world use cases:
 ## Development Notes
 
 ### API Client
-The `lib/api-client.ts` file provides a typed API client with methods for all demonstrated endpoints. The client automatically includes the Bearer token in all requests.
+The `lib/api-client.ts` file provides a typed API client with methods for all demonstrated endpoints. The client automatically includes the Bearer token in all requests and handles:
+- Query parameter construction
+- Request/response formatting
+- Error handling with detailed messages
+- File uploads (FormData) and downloads (Blob)
 
 ### Type Safety
 All API responses are typed using TypeScript interfaces defined in `lib/types.ts`, ensuring type safety throughout the application.
+
+### UI/UX Features
+
+#### Accordion-Based Interface
+Each API endpoint page uses shadcn/ui Accordion components to display multiple endpoints in a collapsible, vertical layout. This pattern:
+- Scales well for pages with many endpoints (up to 7 endpoints per page)
+- Allows users to focus on one endpoint at a time
+- Provides better mobile responsiveness than horizontal tabs
+- Maintains clean visual hierarchy
+
+#### Color-Coded HTTP Method Badges
+HTTP method badges use a consistent color coding system implemented through CVA (class-variance-authority) variants:
+- **GET** - Green (`bg-green-500`)
+- **POST** - Blue (`bg-blue-500`)
+- **PATCH** - Orange (`bg-orange-500`)
+- **DELETE** - Red (`bg-red-500`)
+
+This visual system helps users quickly identify endpoint types and actions at a glance.
+
+#### Reusable Test UI Components
+- **ApiTestGet** (`components/api-test-get.tsx`) - For GET and DELETE endpoints
+- **ApiTestMutation** (`components/api-test-mutation.tsx`) - For POST and PATCH endpoints
+
+These components provide:
+- Consistent interface across all pages
+- Parameter input fields with validation
+- JSON body editors for mutations
+- Response display with performance metrics
+- Error handling with detailed messages
 
 ### UI Components
 The application uses [shadcn/ui](https://ui.shadcn.com/) components, built on top of Radix UI primitives and styled with Tailwind CSS. This provides:
@@ -242,22 +365,28 @@ The application uses [shadcn/ui](https://ui.shadcn.com/) components, built on to
 **Components used:**
 - Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter
 - Button (with multiple variants: default, outline, ghost, destructive)
-- Badge (default, secondary, outline, destructive)
-- Input (for API token entry)
+- Badge (with custom HTTP method variants: get, post, patch, delete)
+- Input (for API token entry and parameter inputs)
 - Alert, AlertDescription (for error messages)
 - Skeleton (for loading states)
-- Separator, Tabs (for layout and organization)
+- Accordion, AccordionItem, AccordionTrigger, AccordionContent
+- Separator (for visual division)
 
 ## Future Enhancements
 
 Potential features to add:
-- Asset creation form with full field support
-- User creation and editing
-- Real-time webhook event display
-- Asset content preview
-- Advanced filtering and search
-- Export functionality
-- Dark mode support
+- **Asset Content Preview:** Visual preview of email and landing page HTML
+- **User Creation and Editing:** Full CRUD operations for user management
+- **Real-time Webhook Events:** Display and monitor webhook events as they occur
+- **Advanced Search:** Global search across all resources with fuzzy matching
+- **Bulk Operations:** Multi-select and batch actions for assets, folders, and merge tags
+- **Export Functionality:** Export data to CSV, JSON, or Excel formats
+- **Dark Mode Support:** Theme toggle for light/dark color schemes
+- **Asset Analytics:** View usage statistics and performance metrics for assets
+- **Collaboration Features:** Comments, approvals, and workflow management
+- **Template Library:** Browse and clone pre-built email/landing page templates
+- **API Response Caching:** Cache frequently accessed resources for better performance
+- **Keyboard Shortcuts:** Power-user keyboard navigation and actions
 
 ## License
 

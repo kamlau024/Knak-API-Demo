@@ -1,0 +1,35 @@
+{
+  "name": "knak-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Knak Enterprise API",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "generate:client": "openapi-typescript ../openapi.yml -o src/generated/api-types.ts",
+    "generate:manifest": "tsx src/scripts/generateManifest.ts",
+    "validate:openapi": "npx @redocly/cli lint ../openapi.yml"
+  },
+  "keywords": [
+    "mcp",
+    "knak",
+    "api",
+    "server"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "openapi-fetch": "^0.12.2"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-parser": "^10.1.0",
+    "@redocly/cli": "^1.25.14",
+    "@types/node": "^22.10.5",
+    "openapi-typescript": "^7.4.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,857 @@
+{
+  "tools": [
+    {
+      "name": "get_users",
+      "description": "Retrieve a page of [users](#tag/user_model) in the organization.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "filter[email]": {
+            "type": "string",
+            "example": "email@knak.com",
+            "description": "Filter users by email. Partial match filter."
+          },
+          "sort": {
+            "type": "string",
+            "example": "created_at",
+            "description": "Sort users by field (created_at, updated_at)."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_usersByUserId",
+      "description": "Retrieve a specific [user](#tag/user_model)'s information.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "ID of user"
+          }
+        },
+        "required": [
+          "user_id"
+        ]
+      }
+    },
+    {
+      "name": "delete_usersByUserId",
+      "description": "Delete [user](#tag/user_model) via their ID (if permissions allow).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "ID of user to delete"
+          },
+          "user_to_reassign": {
+            "type": "string",
+            "description": "ID of user to reassign approvals to if deleted user is currently a reviewer"
+          }
+        },
+        "required": [
+          "user_id"
+        ]
+      }
+    },
+    {
+      "name": "get_assets",
+      "description": "Retrieve all [assets](#tag/asset_model)  in organization.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          },
+          "filter[parent_asset_id]": {
+            "type": "string",
+            "description": "Filter assets by parent asset ID. Exact match filter."
+          }
+        }
+      }
+    },
+    {
+      "name": "post_assets",
+      "description": "Create an [asset](#tag/asset_model). Can either be a email or landing page, and must be associated with a campaign.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "test"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "email",
+              "landing"
+            ],
+            "maxLength": 13,
+            "example": "email"
+          },
+          "campaign_id": {
+            "type": "string",
+            "maxLength": 13,
+            "example": "609d7ce223411"
+          },
+          "from_name": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 191,
+            "example": "Sender"
+          },
+          "from_email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true,
+            "maxLength": 191,
+            "example": "email@knak.com"
+          },
+          "reply_email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true,
+            "maxLength": 191,
+            "example": "reply_email@knak.com"
+          },
+          "subject": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500,
+            "example": "Email Subject"
+          },
+          "preview_text": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500,
+            "example": "This is the preview text."
+          },
+          "theme_id": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 13,
+            "example": "609d7ce223411"
+          },
+          "custom_fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "custom_field_key_1"
+                },
+                "value": {
+                  "type": "string",
+                  "example": "field value 1"
+                }
+              }
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "tag 1"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "campaign_id"
+        ]
+      }
+    },
+    {
+      "name": "get_assetsByAssetId",
+      "description": "Retrieve a specific [asset](#tag/asset_model)'s information, given their asset ID.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "description": "ID of asset"
+          }
+        },
+        "required": [
+          "asset_id"
+        ]
+      }
+    },
+    {
+      "name": "get_assetsByAssetIdContent",
+      "description": "Retrieve a specific asset's html content. Returns a similar response to the /assets/ GET endpoint, but includes field 'html' in the response.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "description": "ID of asset"
+          },
+          "platform": {
+            "type": "string",
+            "description": "name of platform"
+          }
+        },
+        "required": [
+          "asset_id"
+        ]
+      }
+    },
+    {
+      "name": "get_assetsByAssetIdCustomFields",
+      "description": "Retrieve the custom fields that are defined on a specific asset.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "description": "ID of asset"
+          }
+        },
+        "required": [
+          "asset_id"
+        ]
+      }
+    },
+    {
+      "name": "patch_assetsByAssetIdCustomFields",
+      "description": "Edit the custom field values of a specific asset.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string",
+            "description": "ID of asset"
+          },
+          "asset_custom_fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "example": "custom_field_key_1"
+                },
+                "value": {
+                  "type": "string",
+                  "example": "field value 1"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "asset_id"
+        ]
+      }
+    },
+    {
+      "name": "get_assetsByAssetIdProjectManagementLink",
+      "description": "Retrieve the most recently created project management link for an asset.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id"
+        ]
+      }
+    },
+    {
+      "name": "patch_assetsByAssetIdProjectManagementLink",
+      "description": "Update the most recently created project management link for an asset or create a new one if one does not exist.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          },
+          "integration_id": {
+            "type": "string",
+            "example": "609d7ce223411"
+          },
+          "project_management_url": {
+            "type": "string",
+            "example": "https://knak.my.workfront.com/task/64a521d456747a13ec3fc60911274eda2/documents"
+          }
+        },
+        "required": [
+          "asset_id"
+        ]
+      }
+    },
+    {
+      "name": "delete_assetsByAssetIdProjectManagementLink",
+      "description": "Delete the most recently created project management link for an asset.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id"
+        ]
+      }
+    },
+    {
+      "name": "get_themes",
+      "description": "Retrieve all [themes](#tag/theme_model) in organization.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "filter[name]": {
+            "type": "string",
+            "example": "Spring Newsletter",
+            "description": "Filter themes by name. Exact match filter."
+          },
+          "filter[tags]": {
+            "type": "string",
+            "example": "Newsletter,Outreach",
+            "description": "Filter themes by tags. Scope match filter."
+          },
+          "filter[published]": {
+            "type": "boolean",
+            "example": true,
+            "description": "Filter themes by published status. Scope match filter."
+          },
+          "sort": {
+            "type": "string",
+            "example": "created_at",
+            "description": "Sort themes by field (created_at, updated_at)."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_themesByThemeId",
+      "description": "Retrieve a specific [themes](#tag/theme_model)'s information, given their theme ID.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "theme_id": {
+            "type": "string",
+            "description": "ID of theme"
+          }
+        },
+        "required": [
+          "theme_id"
+        ]
+      }
+    },
+    {
+      "name": "get_assetFolders",
+      "description": "Retrieve company [asset folders](#tag/asset_folder_model).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "filter[brand_id]": {
+            "type": "string",
+            "description": "ID of brand to filter by. Exact match filter."
+          },
+          "filter[parent_folder_id]": {
+            "type": "string",
+            "description": "ID of parent folder to filter by. Exact match filter."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          }
+        }
+      }
+    },
+    {
+      "name": "post_assetFolders",
+      "description": "Create an [asset folders](#tag/asset_folder_model).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "test",
+            "maxLength": 191
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "folder",
+              "campaign"
+            ],
+            "example": "folder"
+          },
+          "parent_folder_id": {
+            "type": "string",
+            "maxLength": 13,
+            "example": "609d7ce223411"
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "parent_folder_id"
+        ]
+      }
+    },
+    {
+      "name": "patch_assetFoldersByAssetFolderId",
+      "description": "Update an [asset folders](#tag/asset_folder_model).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_folder_id": {
+            "type": "string",
+            "description": "ID of asset folder"
+          },
+          "name": {
+            "type": "string",
+            "example": "test",
+            "maxLength": 191
+          },
+          "parent_folder_id": {
+            "type": "string",
+            "maxLength": 13,
+            "example": "609d7ce223411"
+          }
+        },
+        "required": [
+          "asset_folder_id"
+        ]
+      }
+    },
+    {
+      "name": "delete_assetFoldersByAssetFolderId",
+      "description": "Delete an [asset folders](#tag/asset_folder_model) and all its sub-content including folders, campaigns and assets.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_folder_id": {
+            "type": "string",
+            "description": "ID of asset folder"
+          }
+        },
+        "required": [
+          "asset_folder_id"
+        ]
+      }
+    },
+    {
+      "name": "get_syncStatusesBySyncStatusId",
+      "description": "Retrieve a specific [sync status](#tag/sync_status).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sync_status_id": {
+            "type": "string",
+            "description": "ID of the sync status to retrieve"
+          }
+        },
+        "required": [
+          "sync_status_id"
+        ]
+      }
+    },
+    {
+      "name": "patch_syncStatusesBySyncStatusId",
+      "description": "Update a specific [sync status](#tag/sync_status).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sync_status_id": {
+            "type": "string",
+            "description": "ID of the sync status to update"
+          },
+          "map_id": {
+            "type": "string",
+            "example": 123456
+          },
+          "map_url": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://www.map.com/123456"
+          },
+          "error_message": {
+            "type": "string",
+            "nullable": true,
+            "example": "Error creating asset in MAP"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "in_progress",
+              "complete",
+              "error",
+              "confirmation_requested"
+            ]
+          }
+        },
+        "required": [
+          "sync_status_id"
+        ]
+      }
+    },
+    {
+      "name": "get_brands",
+      "description": "Retrieve all [brands](#tag/brand_model) in the organization.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sort": {
+            "type": "string",
+            "example": "created_at",
+            "description": "Sort users by field (created_at, updated_at)."
+          },
+          "page": {
+            "type": "integer",
+            "description": "Page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_assetCustomFieldsets",
+      "description": "Retrieve all [asset custom fieldsets](#tag/asset_custom_fieldset).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_assetCustomFieldsetsByAssetCustomFieldsetIdAssetCustomFields",
+      "description": "Retrieve all asset custom fields within an [asset custom fieldset](#tag/asset_custom_fieldset).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset_custom_fieldset_id": {
+            "type": "string",
+            "description": "ID of asset custom fieldset"
+          }
+        },
+        "required": [
+          "asset_custom_fieldset_id"
+        ]
+      }
+    },
+    {
+      "name": "get_availablePlatforms",
+      "description": "Retrieve all [available platforms](#tag/available_platform) for your company.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_mergeTags",
+      "description": "Retrieve all [merge tags](#tag/merge_tag) for your company.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          },
+          "filter[name]": {
+            "type": "string",
+            "description": "Filter by name. Exact match filter."
+          },
+          "filter[platform_id]": {
+            "type": "string",
+            "description": "Filter by platform ID. Exact match filter."
+          }
+        }
+      }
+    },
+    {
+      "name": "post_mergeTags",
+      "description": "Create a [merge tag](#tag/merge_tag). Requires permission to manage merge tags.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Lead First Name"
+          },
+          "platform_id": {
+            "type": "string",
+            "example": "marketo"
+          },
+          "merge_tag_value": {
+            "type": "string",
+            "example": "{{lead.firstName}}"
+          },
+          "description": {
+            "type": "string",
+            "example": "The first name of the lead in Marketo"
+          },
+          "is_special_link": {
+            "type": "boolean",
+            "example": false
+          },
+          "velocity_script_token": {
+            "type": "string",
+            "example": "${lead.firstName}"
+          }
+        },
+        "required": [
+          "name",
+          "platform_id",
+          "merge_tag_value"
+        ]
+      }
+    },
+    {
+      "name": "get_mergeTagsByMergeTagId",
+      "description": "Retrieve a specific [merge tag](#tag/merge_tag) via their ID.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of merge tag to get"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "patch_mergeTagsByMergeTagId",
+      "description": "Update a specific [merge tag](#tag/merge_tag) via their ID (if user has manage merge tags permission). This endpoint allows partial updates - only the fields provided in the request body will be updated.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of merge tag to update"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the merge tag",
+            "example": "Updated description for the merge tag"
+          },
+          "merge_tag_value": {
+            "type": "string",
+            "description": "The merge tag value/mapped name",
+            "example": "{{lead.UpdatedField}}"
+          },
+          "velocity_script_token": {
+            "type": "string",
+            "description": "The velocity script token",
+            "example": "${lead.UpdatedField}"
+          },
+          "is_special_link": {
+            "type": "boolean",
+            "description": "Whether the merge tag is a special link (only applicable for Marketo platform).",
+            "example": false
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "delete_mergeTagsByMergeTagId",
+      "description": "Delete a [merge tag](#tag/merge_tag) via their ID (if user has manage merge tags permission).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of merge tag to delete"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "get_translationRequests",
+      "description": "Retrieve all [translation requests](#tag/translation_request) that the API user has access to based on their brand scopes.\n\n  **NOTE:** Only translation requests created from custom translation integrations will be visible. Steps to set up a custom translation integration can be found [here](https://help.knak.io/en/articles/9687639-knak-custom-translation-integration-setup-guide).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Page number"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page"
+          },
+          "filter[status]": {
+            "type": "string",
+            "example": "requested",
+            "description": "Filter by status. Exact match filter."
+          },
+          "filter[asset_id]": {
+            "type": "string",
+            "example": "609ca344d1b1b",
+            "description": "Filter by asset ID. Exact match filter. (Corresponds to `base_asset_id` in response)"
+          },
+          "filter[created_at_before]": {
+            "type": "string",
+            "example": "2023-04-01T00:00:00Z",
+            "description": "Filter translation requests created before a specific date, formatted in ISO 8601 format. Can be used in conjunction with `created_at_after` filter"
+          },
+          "filter[created_at_after]": {
+            "type": "string",
+            "example": "2023-04-03T00:00:00Z",
+            "description": "Filter translation requests created after a specific date, formatted in ISO 8601 format. Can be used in conjunction with `created_at_before` filter"
+          },
+          "sort": {
+            "type": "string",
+            "example": "created_at",
+            "description": "Sort by field (`created_at`, `updated_at`), use '-' to reverse order of sort (e.g. -created_at)."
+          }
+        }
+      }
+    },
+    {
+      "name": "get_translationRequestsById",
+      "description": "Retrieve a [translation request](#tag/translation_request) created from a custom translation integration.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of the translation request to retrieve"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "patch_translationRequestsById",
+      "description": "Update the status of a [translation request](#tag/translation_request).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of the translation request to update"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "processing",
+              "completed",
+              "failed",
+              "cancelled"
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "get_translationRequestsByIdDownloadSource",
+      "description": "Download the source file for a [translation request](#tag/translation_request)  in the specified format. The `content-type` of the response will change depending on the format requested.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of the translation request to download the source file for"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "arb",
+              "xliff-1.2",
+              "xliff-2.0"
+            ],
+            "description": "Format of the source file to download"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "post_translationRequestsByIdUploadTranslation",
+      "description": "Upload a completed translation file for a [translation request](#tag/translation_request). The file is validated synchronously and the result of the validation is given by the response. If the file is valid (indicated by a 200 response), then the translation will be applied in Knak asynchronously. Once applied, the `status` of the translation request will be updated to `completed` automatically.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of the translation request to upload a translation file for"
+          },
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "The translated file to apply"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    }
+  ]
+}

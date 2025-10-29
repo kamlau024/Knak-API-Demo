@@ -2,6 +2,15 @@
 
 A prototype Next.js application for exploring and interacting with the Knak Enterprise API. This application demonstrates the various API endpoint groups and their use cases in an intuitive, interactive interface.
 
+## Projects in this Repository
+
+This repository contains two projects:
+
+1. **Web Application** - An interactive Next.js application for exploring the Knak API
+2. **MCP Server** (`/mcp-server`) - A Model Context Protocol server that provides Claude and other LLMs with access to the Knak API
+
+See [`/mcp-server/README.md`](./mcp-server/README.md) for MCP server documentation.
+
 ## About Knak
 
 Knak is a no-code email and landing page builder designed for enterprise marketing teams. It enables teams to create beautiful, on-brand campaigns without requiring coding skills.

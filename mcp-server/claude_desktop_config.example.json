@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "knak": {
+      "command": "node",
+      "args": ["/absolute/path/to/Knak-API-Demo/mcp-server/dist/index.js"],
+      "env": {
+        "KNAK_API_TOKEN": "your-knak-api-token-here"
+      }
+    }
+  }
+}
